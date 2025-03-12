@@ -101,3 +101,20 @@ we should add 'new' fuction that we mention in urls.py file
 def new(request):
     return HttpResponse('New Products')
 ```
+
+git add .
+git commit -m "added /product/new directory"
+git push
+
+create a pull request and accept it in github.
+
+### models
+
+products/models.py;
+```
+class Product(models.Model): # Product is a class that inherits from models.Model
+    name = models.CharField(max_length=255)
+    price = models.FloatField()
+    stock = models.IntegerField()
+    image_url = models.CharField(max_length=2083)
+```
