@@ -72,3 +72,32 @@ urlpatterns = [
     path('', views.index), # this is the path to the index view
 ]
 ```
+
+there is an urls.py in pyshop. Its like parent.
+```
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('products/', include('products.urls')) #we added this path. when user go this directory, it refer products.urls.py file.
+]
+
+```
+
+
+products/urls.py;
+
+* added "new" directory (http:.../products/new/)
+```
+    path('new',views.new) # this is "new" directory of products app
+```
+
+
+product/views.py;
+we should add 'new' fuction that we mention in urls.py file
+```
+...
+def new(request):
+    return HttpResponse('New Products')
+```
