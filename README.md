@@ -339,3 +339,90 @@ class Offer(models.Model):
         verbose_name_plural = "Offers"
 ```
 
+
+lets commit what we did
+```
+git add .
+git commit -m "Edited Admin Panel2"
+git push origin dev
+```
+
+### Templates
+
+create temlpates directory;
+/products/templates/
+
+add new file under this directory;
+/products/templates/index.html;
+
+```
+<h1>Products<h1>
+<ul>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+<ul>
+
+```
+
+
+products/views.py
+```
+from .models import Product # Importing Product model from models.py file.
+...
+
+def index(request):
+    products = Product.objects.all() # Fetch all products from database and load them to products variable.
+    return render(request, 'index.html')
+    # render function takes request object as a first argument. Second arguemnt is the name of template.
+    # django will look for this template in the templates directory of the app.
+    # In this case, it will look for index.html in products/templates directory.
+    # And render this template to the user.
+
+```
+
+ProductPage1.png
+
+products/views.py
+```
+...
+def index(request):
+    products = Product.objects.all() # Fetch all products from database and load them to products variable.
+    #return HttpResponse('Products Homepage')
+    return render(request, 'index.html',
+                  {'products': products})
+
+'''
+   How render function works:
+        Render function takes request object as a first argument. 
+        
+        Second arguemnt is the name of template.
+        django will look for this template in the templates directory of the app.
+        In this case, it will look for index.html in products/templates directory.
+        And render this template to the user.
+
+        Third argument is the context. Context is a dictionary 
+        that contains all the data that we want to pass to the template.
+        In this case, we are passing products to the template.
+        So, we can use this products variable in the template.
+        We can use this products variable to show all products in the template.
+'''
+```
+
+update index html and use template tags;
+/products/templates/index.html;
+
+```
+<h1>Products<h1>
+    <ul>
+        {% for product in products %} <!-- products is given as 3rd argument in render function in views.py -->
+            <li>{{ product.name }} - {{ product.price }}</li>
+        {% endfor %}
+    <ul>
+```
+ProductPage2.png
+
+
+### adding bootstrap
+
+(can be addes later)
