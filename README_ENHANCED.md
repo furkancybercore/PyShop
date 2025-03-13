@@ -413,6 +413,13 @@ admin.site.register(Product) # Admin object, site is attribute and object itself
                              # This will make the Product model available in the admin interface.
 ```
 
+After registiring models looks like this, to make it meaningful we need to make small changes;
+
+![Initial Admin Panel](images/AdminPanel3.png)
+
+
+
+
 ### Customizing the Admin Panel
 
 Let's customize how our products are displayed in the admin panel:
@@ -689,13 +696,5 @@ git push --force origin feature/messy-feature
 
 For more detailed information about the code used in this project, please refer to the [Code Documentation](CODE_DOCUMENTATION.md) file.
 
-### Online Resources
-
-- [Django Official Documentation](https://docs.djangoproject.com/)
-- [Django Girls Tutorial](https://tutorial.djangogirls.org/)
-- [Django for Beginners (Book)](https://djangoforbeginners.com/)
-- [Git Documentation](https://git-scm.com/doc)
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+ 
+ 
