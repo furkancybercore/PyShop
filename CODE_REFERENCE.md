@@ -1,141 +1,130 @@
 # PyShop Code Reference
 
-This document provides a concise explanation of the code used in the PyShop project. For more detailed explanations and step-by-step instructions, refer to the [README.md](README.md).
-
-## Table of Contents
-
-1. [Project Structure](#project-structure)
-2. [Models](#models)
-3. [Views](#views)
-4. [URL Patterns](#url-patterns)
-5. [Admin Interface](#admin-interface)
-6. [Templates](#templates)
+This document provides a concise explanation of the code used in the PyShop e-commerce project.
 
 ## Project Structure
-
-PyShop follows the standard Django project structure:
 
 ```
 PyShop/
 ├── manage.py              # Django's command-line utility for administrative tasks
 ├── pyshop/                # Main project directory
-│   ├── __init__.py        # Marks directory as Python package
+│   ├── __init__.py        # Makes pyshop a Python package
 │   ├── settings.py        # Project settings
-│   ├── urls.py            # Project URL configuration
-│   ├── asgi.py            # ASGI configuration for deployment
-│   └── wsgi.py            # WSGI configuration for deployment
-└── products/              # Products app directory
-    ├── __init__.py        # Marks directory as Python package
-    ├── admin.py           # Admin interface configuration
-    ├── apps.py            # App configuration
-    ├── migrations/        # Database migrations
-    ├── models.py          # Data models
-    ├── tests.py           # Test cases
-    ├── urls.py            # App URL configuration
-    ├── views.py           # View functions/classes
-    └── templates/         # HTML templates
-        └── index.html     # Product listing template
+│   ├── urls.py            # Main URL router
+│   ├── asgi.py            # ASGI configuration
+│   └── wsgi.py            # WSGI configuration
+├── products/              # Products app directory
+│   ├── __init__.py        # Makes products a Python package
+│   ├── admin.py           # Admin interface configuration
+│   ├── apps.py            # App configuration
+│   ├── migrations/        # Database migrations
+│   ├── models.py          # Database models
+│   ├── templates/         # HTML templates
+│   │   └── index.html     # Product listing template
+│   ├── tests.py           # Test cases
+│   ├── urls.py            # URL patterns for the app
+│   └── views.py           # View functions
+└── db.sqlite3             # SQLite database file
 ```
 
-## Models
+## Key Code Components
 
-### Product Model
+### Models (products/models.py)
 
 ```python
+from django.db import models
+
 class Product(models.Model):
-    name = models.CharField(max_length=255)      # Product name
-    price = models.FloatField()                  # Product price
-    stock = models.IntegerField()                # Available quantity
-    image_url = models.CharField(max_length=2083) # URL to product image
+    name = models.CharField(max_length=255)  # Product name
+    price = models.FloatField()              # Product price
+    stock = models.IntegerField()            # Available quantity
+    image_url = models.CharField(max_length=2083)  # Product image URL
     
-    class Meta:
-        verbose_name = "Product"
-        verbose_name_plural = "Products"
-```
-
-### Offer Model
-
-```python
 class Offer(models.Model):
-    code = models.CharField(max_length=10)       # Discount code (e.g., "SUMMER10")
-    description = models.CharField(max_length=255) # Offer description
-    discount = models.FloatField()               # Discount amount
-    
-    class Meta:
-        verbose_name = "Offer"
-        verbose_name_plural = "Offers"
+    code = models.CharField(max_length=10)        # Offer code (e.g., "SUMMER10")
+    description = models.CharField(max_length=255)  # Offer description
+    discount = models.FloatField()                 # Discount amount (e.g., 0.2 for 20%)
 ```
 
-## Views
+These models define the database schema for the application. Django automatically creates database tables based on these model definitions.
 
-### Product List View
+### Views (products/views.py)
 
 ```python
+from django.shortcuts import render
+from django.http import HttpResponse
+from .models import Product
+
 def index(request):
-    # Fetch all products from the database
-    products = Product.objects.all()
-    
-    # Render the index template with the products
-    return render(request, 'index.html', {'products': products})
-```
+    products = Product.objects.all()  # Get all products from database
+    return render(request, 'index.html', {'products': products})  # Render template with products
 
-### New Products View
-
-```python
 def new(request):
-    # Simple response for the new products page
-    return HttpResponse('New Products')
+    return HttpResponse('New Products')  # Simple text response
 ```
 
-## URL Patterns
+Views are responsible for processing requests and returning responses. The `index` view fetches all products and renders the `index.html` template. The `new` view returns a simple text response.
 
-### App-level URLs (products/urls.py)
+### URL Configuration (products/urls.py)
 
 ```python
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index),     # Root path (/products/) maps to index view
-    path('new', views.new)     # /products/new/ maps to new view
+    path('', views.index),     # Route root URL to index view
+    path('new', views.new)     # Route /new URL to new view
 ]
 ```
 
-### Project-level URLs (pyshop/urls.py)
+This maps URL patterns to view functions within the products app.
+
+### Main URL Configuration (pyshop/urls.py)
 
 ```python
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),             # Admin interface
-    path('products/', include('products.urls'))  # Include the products app URLs
+    path('admin/', admin.site.urls),           # Django admin URLs
+    path('products/', include('products.urls'))  # Include products app URLs under /products/
 ]
 ```
 
-## Admin Interface
+This includes the products app URLs and sets up the Django admin URLs.
 
-### Product Admin Configuration
+### Admin Configuration (products/admin.py)
 
 ```python
+from django.contrib import admin
+from .models import Product, Offer
+
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'stock')  # Fields to display in the list view
+    list_display = ('name', 'price', 'stock')  # Fields to display in admin list view
 
-admin.site.register(Product, ProductAdmin)
-```
-
-### Offer Admin Configuration
-
-```python
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ('code', 'discount')  # Fields to display in the list view
+    list_display = ('code', 'discount')  # Fields to display in admin list view
 
-admin.site.register(Offer, OfferAdmin)
+admin.site.register(Product, ProductAdmin)  # Register Product model with admin
+admin.site.register(Offer, OfferAdmin)      # Register Offer model with admin
 ```
 
-## Templates
+This code configures how models appear in the Django admin interface.
 
-### Product Listing Template (index.html)
+### Template (products/templates/index.html)
+
+```html
+<h1>Products</h1>
+<ul>
+    {% for product in products %}
+        <li>{{ product.name }} - ${{ product.price }}</li>
+    {% endfor %}
+</ul>
+```
+
+This template uses Django's template language to iterate over the products and display their names and prices.
+
+### Enhanced Template (with Bootstrap)
 
 ```html
 <!DOCTYPE html>
@@ -172,29 +161,38 @@ admin.site.register(Offer, OfferAdmin)
 </html>
 ```
 
-## Django Commands Reference
+This enhanced template uses Bootstrap to create a responsive grid layout with cards for each product.
 
-| Command | Description |
-|---------|-------------|
-| `python3 -m venv venv` | Create a virtual environment |
-| `source venv/bin/activate` | Activate the virtual environment |
-| `pip install django` | Install Django |
-| `django-admin startproject projectname` | Create a new Django project |
-| `python manage.py startapp appname` | Create a new Django app |
-| `python manage.py runserver` | Start the development server |
-| `python manage.py makemigrations` | Create database migrations |
-| `python manage.py migrate` | Apply database migrations |
-| `python manage.py createsuperuser` | Create an admin user |
-| `python manage.py shell` | Open Django shell |
+## Key Django Concepts Used
 
-## Git Commands Reference
+1. **Models**: Define database structure using Python classes
+2. **Views**: Handle HTTP requests and generate responses
+3. **Templates**: Define the presentation layer using Django's template language
+4. **URL Patterns**: Define URL routes and connect them to views
+5. **Admin Interface**: Provides a built-in CRUD interface for models
+6. **Migrations**: Track and apply database schema changes
 
-| Command | Description |
-|---------|-------------|
-| `git clone <url>` | Clone a repository |
-| `git checkout -b <branch>` | Create and switch to a new branch |
-| `git add .` | Stage all changes |
-| `git commit -m "message"` | Commit staged changes |
-| `git push -u origin <branch>` | Push to remote and set upstream |
-| `git pull origin <branch>` | Pull changes from remote |
-| `git merge <branch>` | Merge a branch into current branch | 
+## Common Django Commands
+
+```bash
+# Create a new project
+django-admin startproject project_name
+
+# Create a new app
+python manage.py startapp app_name
+
+# Create database migrations
+python manage.py makemigrations
+
+# Apply migrations to the database
+python manage.py migrate
+
+# Create a superuser for the admin interface
+python manage.py createsuperuser
+
+# Run the development server
+python manage.py runserver
+
+# Run Django shell (interactive Python shell with Django context)
+python manage.py shell
+``` 
